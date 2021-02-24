@@ -4,7 +4,7 @@ Ash Player is a social video player that allows watching videos in sync with fri
   - App: Electron + Angular
   - Video player: `libvlc` (through [WebChimera.js](https://github.com/RSATom/WebChimera.js/))
   - Authentication: Firebase Authentication
-  - Database: Firebase Realtime Database
+  - Database: Firestore
 
 # Setup
 
