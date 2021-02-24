@@ -1,27 +1,27 @@
-# AshPlayer
+# Ash Player
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.1.
+Ash Player is a social video player that allows watching videos in sync with friends. The following core technologies are used:
+  - App: Electron + Angular
+  - Video player: `libvlc` (through [WebChimera.js](https://github.com/RSATom/WebChimera.js/))
+  - Authentication: Firebase Authentication
+  - Database: Firebase Realtime Database
 
-## Development server
+# Setup
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+  1. Create a Firebase project
+  2. Enable Email/Password authentication
+  3. Enable Firestore
+  4. Copy the content of `firestore.rules` and paste them into Firestore rules
+  5. Generate a Firebase web credentials config and save it at `src/app/firebase.cert.json`
 
-## Code scaffolding
+# Launching
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm start
+```
 
-## Build
+# Building
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```bash
+npm run build
+```

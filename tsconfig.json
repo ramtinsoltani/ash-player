@@ -8,14 +8,21 @@
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "importHelpers": true,
+    "resolveJsonModule": true,
     "target": "es2015",
     "module": "es2020",
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "@ash-player/firebase-cert": ["src/app/firebase.cert.json"],
+      "@ash-player/service/*": ["src/app/services/*.service"],
+      "@ash-player/model/*": ["src/app/models/*.model"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false
