@@ -15,11 +15,11 @@ Ash Player is a social video player that allows watching videos in sync with fri
   5. Generate a Firebase web credentials config and save it at `src/app/firebase.cert.json`
   6. Setup, build, and host [AshPlayer Server](https://github.com/ramtinsoltani/ash-player-server)
   7. Create file `/src/app/app.config.json` with the following content (replace `HOSTED_SERVER_URL` with the full address of the hosted server):
-    ```json
-    {
-      "serverUrl": "HOSTED_SERVER_URL"
-    }
-    ```
+      ```json
+      {
+        "serverUrl": "HOSTED_SERVER_URL"
+      }
+      ```
 
 # Launching
 
