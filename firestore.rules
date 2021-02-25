@@ -17,7 +17,7 @@ service cloud.firestore {
 
     match /users/{uid} {
 
-      allow read: if isRegistered();
+      allow get: if isRegistered();
 
     }
 
@@ -31,7 +31,7 @@ service cloud.firestore {
 
     match /invitations/{id} {
 
-    	allow get: if
+    	allow read: if
         isRegistered() &&
         (request.auth.uid == resource.data.to || request.auth.uid == resource.data.from);
 

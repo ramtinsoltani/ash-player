@@ -14,13 +14,12 @@ export interface Invitation {
   from: string;
   to: string;
   sessionId: string;
-  accepted: boolean;
 }
 
 export interface Session {
   host: string;
   started: boolean;
-  signal: 'start'|'pause'|'resume'|'stop'|'time:*';
+  signal: 'start'|'pause'|'resume'|'stop'|`time-${number}`;
   watchTargetLength: number;
   members: {
     [uid: string]: {
