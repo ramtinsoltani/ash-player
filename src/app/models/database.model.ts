@@ -13,18 +13,26 @@ export interface ContactsList {
 export interface Invitation {
   from: string;
   to: string;
-  sessionId: string;
+  session: string;
 }
 
 export interface Session {
   host: string;
   started: boolean;
-  signal: 'start'|'pause'|'resume'|'stop'|`time-${number}`;
-  watchTargetLength: number;
+  signal?: 'start'|'pause'|'resume'|'stop'|`time:${number}`|'end';
+  targetLength: number;
   members: {
     [uid: string]: {
-      selectedTargetLength: number;
-      status: 'ready'|'mismatch'|'not-ready';
+      targetLength?: number;
+      status: SessionMemberStatus;
     };
   };
+}
+
+export enum SessionMemberStatus {
+
+  NotReady = 'not-ready',
+  Ready = 'ready',
+  Mismatch = 'mismatch'
+
 }
