@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BackendService } from '@ash-player/service/backend';
 import { FirebaseService } from '@ash-player/service/firebase';
 import { NotificationsService } from '@ash-player/service/notifications';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,16 +34,16 @@ export class AppService {
   }
 
   /**
-  * Handles the promise silently and returns a void promise that will always resolve.
+  * Handles the promise silently and returns a promise that will always resolve with either the resolved value or undefined.
   * @param promise A promise to handle.
   */
-  public silent(promise: Promise<any>) {
+  public silent<T>(promise: Promise<T>) {
 
-    return new Promise<void>(resolve => {
+    return new Promise<T>(resolve => {
 
       promise
-      .then(() => resolve())
-      .catch(() => resolve());
+      .then(resolve)
+      .catch(() => resolve(undefined));
 
     });
 
@@ -78,6 +80,24 @@ export class AppService {
   public async logout() {
 
     await this.notifyOnError(this.firebase.logout());
+
+  }
+
+  public getContacts() {
+
+    return this.firebase.getContacts()
+    .pipe(catchError(error => {
+
+      this.notifications.error(error.message, error);
+      return throwError(error);
+
+    }))
+
+  }
+
+  public getUser(uid: string) {
+
+    return this.notifyOnError(this.firebase.getUser(uid));
 
   }
 

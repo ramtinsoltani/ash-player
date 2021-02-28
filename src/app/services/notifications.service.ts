@@ -6,11 +6,11 @@ import { Subject } from 'rxjs';
 })
 export class NotificationsService {
 
-  private notifications = new Subject<Notification>();
+  private notifications$ = new Subject<Notification>();
 
   constructor() {
 
-    this.notifications.subscribe(notification => {
+    this.notifications$.subscribe(notification => {
 
       if ( notification.type === NotificationType.Error )
         console.error(notification.message, ...notification.additionalMessages);
@@ -20,36 +20,36 @@ export class NotificationsService {
         console.log(notification.message, ...notification.additionalMessages);
 
     });
-    
+
   }
 
   public subscribe(observer: (notification: Notification) => void) {
 
-    return this.notifications.subscribe(observer);
+    return this.notifications$.subscribe(observer);
 
   }
 
   public info(message: string, ...additionalMessages: any[]) {
 
-    this.notifications.next({ type: NotificationType.Info, message, additionalMessages });
+    this.notifications$.next({ type: NotificationType.Info, message, additionalMessages });
 
   }
 
   public warning(message: string, ...additionalMessages: any[]) {
 
-    this.notifications.next({ type: NotificationType.Warning, message, additionalMessages });
+    this.notifications$.next({ type: NotificationType.Warning, message, additionalMessages });
 
   }
 
   public error(message: string, ...additionalMessages: any[]) {
 
-    this.notifications.next({ type: NotificationType.Error, message, additionalMessages });
+    this.notifications$.next({ type: NotificationType.Error, message, additionalMessages });
 
   }
 
   public success(message: string, ...additionalMessages: any[]) {
 
-    this.notifications.next({ type: NotificationType.Success, message, additionalMessages });
+    this.notifications$.next({ type: NotificationType.Success, message, additionalMessages });
 
   }
 
