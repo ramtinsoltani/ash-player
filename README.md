@@ -1,6 +1,6 @@
 # AshPlayer
 
-Ash Player is a social video player that allows watching videos in sync with friends. The following core technologies are used:
+AshPlayer is a social video player that allows watching videos in sync with friends. The following core technologies are used:
   - App: Electron + Angular
   - Video player: `libvlc` (through [WebChimera.js](https://github.com/RSATom/WebChimera.js/))
   - Authentication: Firebase Authentication

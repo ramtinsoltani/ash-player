@@ -1,0 +1,32 @@
+@import 'util';
+
+@mixin dropshadow {
+  box-shadow: 0 rem(1px) rem(6px) color('shadow');
+}
+
+@mixin glass {
+  background-color: rgba(0, 0, 0, .2);
+  backdrop-filter: blur(10px) saturate(1.5);
+}
+
+@mixin loader(
+  $size: rem(32px),
+  $color: color('blue-light'),
+  $border-size: rem(3px)
+) {
+  width: $size;
+  height: $size;
+  border: $border-size solid rgba($color, 0.25);
+  border-top-color: $color;
+  border-radius: 50%;
+  position: relative;
+  animation: loader-rotate 1s linear infinite;
+  @keyframes loader-rotate {
+    0% {
+      transform: rotate(0);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}

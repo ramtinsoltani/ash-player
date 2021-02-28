@@ -1,1 +1,159 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import 'util';
+
+html, body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Lato', sans-serif;
+  background-color: color('gray-dark');
+  color: color('gray-lightest');
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.color-accent {
+  color: color('blue-light');
+  fill: color('blue-light');
+}
+
+.color-white {
+  color: color('gray-lightest');
+  fill: color('gray-lightest');
+}
+
+.color-danger {
+  color: color('red-light');
+  fill: color('red-light');
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  height: rem(35px);
+  border-radius: rem(3px);
+  color: color('gray-lightest');
+  font: inherit;
+  background-color: color('gray-medium');
+  border: rem(1px) solid color('gray-darker');
+  padding: 0 rem(10px);
+  outline: none;
+  transition: border-color .2s ease-in-out;
+  &.dark {
+    background-color: color('gray-dark');
+    border: rem(1px) solid color('gray-darker');
+  }
+  &:not(:last-child) {
+    margin-bottom: rem(10px);
+  }
+  &::placeholder {
+    color: color('gray-lighter');
+  }
+  &:focus:not(.ng-invalid),
+  &:focus.ng-untouched {
+    border-color: color('blue-light');
+  }
+  &.ng-touched.ng-invalid {
+    border-color: color('red-light');
+  }
+}
+
+.button-group {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+button {
+  appearance: none;
+  outline: none;
+  min-height: rem(35px);
+  border: none;
+  border-radius: rem(3px);
+  padding: rem(10px);
+  text-align: center;
+  color: color('gray-lightest');
+  cursor: pointer;
+  font-size: rem(16px);
+  margin-top: rem(15px);
+  transition: transform .15s ease-in-out, box-shadow .15s ease-in-out, background-color .15s ease-in-out;
+  &.half-width {
+    width: calc(50% - #{rem(5px)});
+    &:not(:first-child) {
+      margin-left: rem(10px);
+    }
+  }
+  &.full-width {
+    width: 100%;
+    & + .half-width {
+      margin-left: 0;
+    }
+  }
+  &.button-primary {
+    background-color: color('blue-light');
+    box-shadow: 0 rem(5px) color('blue-dark');
+    &:active {
+      box-shadow: 0 rem(2px) color('blue-dark');
+    }
+  }
+  &.button-secondary {
+    background-color: color('gray-lighter');
+    box-shadow: 0 rem(5px) color('gray-light');
+    &:active {
+      box-shadow: 0 rem(2px) color('gray-light');
+    }
+  }
+  &.button-danger {
+    background-color: color('red-light');
+    box-shadow: 0 rem(5px) color('red-dark');
+    &:active {
+      box-shadow: 0 rem(2px) color('red-dark');
+    }
+  }
+  &:disabled {
+    cursor: default;
+    color: color('gray-lightest-faded');
+  }
+  &:active {
+    transform: translateY(#{rem(3px)});
+  }
+}
+
+.form-tabs-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: rem(20px);
+  .form-tabs {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    font-size: rem(28px);
+    position: relative;
+    .form-tab {
+      cursor: pointer;
+      padding: 0 rem(10px);
+      color: color('gray-lighter');
+      transition: color .2s ease-in-out;
+      &.selected {
+        color: color('blue-light');
+      }
+    }
+  }
+  .form-tabs-line {
+    width: 100%;
+    height: rem(3px);
+    background-color: color('gray-medium');
+    border-radius: rem(3px);
+    margin-top: rem(10px);
+    .form-tabs-line-cursor {
+      height: 100%;
+      background-color: color('blue-light');
+      border-radius: rem(3px);
+      margin-left: 0;
+      width: 0;
+      transition: width .2s ease-in-out, margin-left .2s ease-in-out;
+    }
+  }
+}

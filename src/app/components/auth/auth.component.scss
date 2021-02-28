@@ -1,0 +1,47 @@
+@import '../../../util';
+
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: rem(370px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  svg.logo {
+    width: 100%;
+    margin-bottom: rem(60px);
+  }
+
+  .form-container {
+    width: rem(300px);
+    min-height: rem(255px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+  }
+
+}
+
+.loader-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

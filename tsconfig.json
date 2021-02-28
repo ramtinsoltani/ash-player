@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@ash-player/firebase-cert": ["src/app/firebase.cert.json"],
+      "@ash-player/config": ["src/app/app.config.json"],
       "@ash-player/service/*": ["src/app/services/*.service"],
       "@ash-player/model/*": ["src/app/models/*.model"]
     }

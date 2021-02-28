@@ -1,0 +1,23 @@
+@import '../../../util';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 100%;
+  align-items: center;
+  padding-top: rem(20px);
+}
+
+.control-button {
+  height: rem(40px);
+  width: rem(40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  &:not(:first-child) {
+    margin-top: rem(20px);
+  }
+}

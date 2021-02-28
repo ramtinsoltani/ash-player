@@ -1,0 +1,13 @@
+@import '../../../util';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  background-color: color('gray-darker');
+  border-right: rem(1px) solid color('gray-darkest');
+  height: 100%;
+  width: rem(100px);
+  flex-shrink: 0;
+  flex-grow: 0;
+  padding: rem(30px) 0;
+}

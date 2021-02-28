@@ -19,7 +19,7 @@ export interface Invitation {
 export interface Session {
   host: string;
   started: boolean;
-  signal?: 'start'|'pause'|'resume'|'stop'|`time:${number}`|'end';
+  signal?: SessionStaticSignal|SessionTimeSignal;
   targetLength: number;
   members: {
     [uid: string]: {
@@ -34,5 +34,21 @@ export enum SessionMemberStatus {
   NotReady = 'not-ready',
   Ready = 'ready',
   Mismatch = 'mismatch'
+
+}
+
+export enum SessionStaticSignal {
+  Start = 'start',
+  Pause = 'pause',
+  Resume = 'resume',
+  Stop = 'stop',
+  End = 'end'
+}
+
+export type SessionTimeSignal = `time:${number}`;
+
+export function toSessionTimeSignal(milliseconds: number) {
+
+  return `time:${milliseconds}`;
 
 }
