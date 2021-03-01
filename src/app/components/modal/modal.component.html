@@ -29,5 +29,23 @@
         <button type="button" name="confirmButton" class="button-danger half-width" (click)="onConfirm()">Proceed</button>
       </div>
     </ng-template>
+    <ng-template [ngIf]="state.content === modalContent.InviteContact">
+      <h3>Invite Contact</h3>
+      <hr>
+      <p>Invite <span class="color-accent">{{ state.data.name }}</span> to current session?</p>
+      <div class="button-group">
+        <button type="button" name="cancelButton" class="button-secondary half-width" (click)="onCancel()">Cancel</button>
+        <button type="button" name="confirmButton" class="button-primary half-width" (click)="onConfirm()">Invite</button>
+      </div>
+    </ng-template>
+    <ng-template [ngIf]="state.content === modalContent.NewInvitation">
+      <h3>Invite Contact</h3>
+      <hr>
+      <p><span class="color-accent">{{ state.data.from }}</span> invited you to watch a video together. Do you want to join?</p>
+      <div class="button-group">
+        <button type="button" name="cancelButton" class="button-danger half-width" (click)="onCancel()">Reject</button>
+        <button type="button" name="confirmButton" class="button-primary half-width" (click)="onConfirm()">Accept</button>
+      </div>
+    </ng-template>
   </div>
 </div>

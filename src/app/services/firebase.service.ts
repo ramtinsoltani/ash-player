@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import firebaseCert from '@ash-player/firebase-cert';
-import { ContactsList, UserWithUID } from '@ash-player/model/database';
+import { ContactsList, UserWithUID, Invitation, Session } from '@ash-player/model/database';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import { cloneDeep } from 'lodash';
 
 type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
+type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>;
 
 @Injectable({
   providedIn: 'root'
@@ -17,34 +17,27 @@ export class FirebaseService {
 
   private _currentUser: UserWithUID = null;
   private _newUser: boolean = false;
+  private _onFullAuthStateChanged$ = new Subject<UserWithUID>();
 
-  constructor(
-    private router: Router
-  ) {
+  constructor() {
 
     firebase.initializeApp(firebaseCert);
 
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(() => {
 
-      if ( ! user ) {
+      // If user was just registered, the user document might not be written yet
+      if ( this._newUser ) return;
 
-        this.updateCurrentUser()
-        .then(() => this.router.navigate(['/auth']))
-        .catch(error => console.error(error));;
-
-      }
-      else {
-
-        // If user was just registered, the user document might not be written yet
-        if ( this._newUser ) return;
-
-        this.updateCurrentUser()
-        .then(() => this.router.navigate(['/home']))
-        .catch(error => console.error(error));
-
-      }
+      this.updateCurrentUser()
+      .catch(error => console.error(error));
 
     });
+
+  }
+
+  public onFullAuthStateChanged(observer: (user: UserWithUID) => void) {
+
+    return this._onFullAuthStateChanged$.subscribe(observer);
 
   }
 
@@ -55,12 +48,14 @@ export class FirebaseService {
     if ( ! firebase.auth().currentUser ) {
 
       this._currentUser = null;
+      this._onFullAuthStateChanged$.next(null);
       return;
 
     }
 
     this._currentUser = await this.getUser(firebase.auth().currentUser.uid);
     this._newUser = false;
+    this._onFullAuthStateChanged$.next(this.currentUser);
 
   }
 
@@ -124,6 +119,31 @@ export class FirebaseService {
 
   }
 
+  public getInvitations() {
+
+    return new Observable<Invitation[]>(observer => {
+
+      const unsubscribe = firebase.firestore()
+      .collection('invitations')
+      .where('to', '==', this.currentUser.uid)
+      .onSnapshot(
+        (query: QuerySnapshot<Invitation>) => {
+
+          if ( ! query.size ) return;
+
+          observer.next(query.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+
+        },
+        observer.error
+      );
+
+      // On unsubscribe
+      observer.add(unsubscribe);
+
+    });
+
+  }
+
   public async getUser(uid: string) {
 
     try {
@@ -133,6 +153,44 @@ export class FirebaseService {
       if ( ! user.exists ) throw new Error('User does not exist!');
 
       return { ...user.data(), uid } as UserWithUID;
+
+    }
+    catch (error) {
+
+      throw error;
+
+    }
+
+  }
+
+  public getUserChanges(uid: string) {
+
+    return new Observable<UserWithUID>(observer => {
+
+      const unsubscribe = firebase.firestore()
+      .collection('users')
+      .doc(uid)
+      .onSnapshot(
+        (doc: DocumentSnapshot<UserWithUID>) => observer.next({ ...doc.data(), uid: doc.id }),
+        observer.error
+      );
+
+      // On unsubscribe
+      observer.add(unsubscribe);
+
+    });
+
+  }
+
+  public async getSession(id: string) {
+
+    try {
+
+      const session = await firebase.firestore().collection('sessions').doc(id).get();
+
+      if ( ! session.exists ) throw new Error('Session does not exist!');
+
+      return session.data() as Session;
 
     }
     catch (error) {

@@ -1,9 +1,21 @@
-<div class="person" (click)="onSelect.emit()" [ngClass]="{ 'add-button': addButton }">
+<div class="person" (click)="onSelect.emit()" [ngClass]="{
+  'add-button': addButton,
+  'no-pointer': currentUser || sessionMember,
+  'status-not-ready': sessionMember && user.status === 'not-ready',
+  'status-ready': sessionMember && user.status === 'ready',
+  'status-mismatch': sessionMember && user.status === 'mismatch'
+}">
   <ng-template [ngIf]="! addButton">
     <img [src]="gravatar" (load)="onGravatarLoaded()" [ngClass]="{ hidden: ! gravatarLoaded }">
     <span *ngIf="! gravatarLoaded" class="name-letter">{{ user.name.substr(0, 1).toUpperCase() }}</span>
-    <span *ngIf="hasPersonBeenRecentlyOnline()" class="status-indicator"></span>
-    <span class="delete-button" (click)="onPersonDelete($event)">
+    <span *ngIf="! currentUser && hasPersonBeenRecentlyOnline()" class="status-indicator"></span>
+    <span *ngIf="currentUser && invitationsCount" class="invitations" (click)="onInvitations.emit()">{{ invitationsCount }}</span>
+    <span *ngIf="sessionMember" class="ban-button" (click)="onBan.emit()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="1.714" viewBox="0 0 8 1.714" class="color-white">
+        <path d="M7.429,208H.571a.572.572,0,0,0-.571.571v.571a.571.571,0,0,0,.571.571H7.429A.571.571,0,0,0,8,209.143v-.571A.572.572,0,0,0,7.429,208Z" transform="translate(0 -208)"/>
+      </svg>
+    </span>
+    <span *ngIf="! currentUser && ! sessionMember" class="delete-button" (click)="onPersonDelete($event)">
       <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" class="color-white">
         <path d="M5.516,84l2.274-2.274a.715.715,0,0,0,0-1.011l-.505-.505a.715.715,0,0,0-1.011,0L4,82.484,1.726,80.209a.715.715,0,0,0-1.011,0l-.505.505a.715.715,0,0,0,0,1.011L2.484,84,.209,86.274a.715.715,0,0,0,0,1.011l.505.505a.715.715,0,0,0,1.011,0L4,85.516l2.274,2.274a.715.715,0,0,0,1.011,0l.505-.505a.715.715,0,0,0,0-1.011Z" transform="translate(0 -80)"/>
       </svg>

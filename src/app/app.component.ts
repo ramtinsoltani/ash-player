@@ -12,7 +12,6 @@ export class AppComponent {
 
   private shortcutCount: number = 0;
   private lastShortcutTime: number;
-  private modalOpened: boolean = false;
 
   constructor(
     private app: AppService,
@@ -35,15 +34,12 @@ export class AppComponent {
 
     this.shortcutCount = 0;
 
-    if ( ! this.firebase.currentUser || this.modalOpened ) return;
+    if ( ! this.firebase.currentUser ) return;
 
-    this.modalOpened = true;
+    if ( ! this.app.openModal(ModalContent.DeleteAccount) ) return;
 
-    this.app.openModal(ModalContent.DeleteAccount);
     this.app.onModalNextState()
     .then(async state => {
-
-      this.modalOpened = false;
 
       if ( state.canceled ) return;
 

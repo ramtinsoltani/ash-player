@@ -15,6 +15,7 @@ export interface ContactsList {
 }
 
 export interface Invitation {
+  id: string;
   from: string;
   to: string;
   session: string;
@@ -24,6 +25,7 @@ export interface Session {
   host: string;
   started: boolean;
   signal?: SessionStaticSignal|SessionTimeSignal;
+  signalTime?: number;
   targetLength: number;
   members: {
     [uid: string]: {

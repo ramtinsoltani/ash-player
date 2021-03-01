@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppService, ModalContent, AddContactModalData } from '@ash-player/service/app';
 import { NotificationsService } from '@ash-player/service/notifications';
-import { UserWithUID } from '@ash-player/model/database';
+import { UserWithUID, Session, SessionMemberStatus } from '@ash-player/model/database';
 import { Subscription } from 'rxjs';
 import { orderBy } from 'lodash';
 
@@ -12,8 +12,12 @@ import { orderBy } from 'lodash';
 })
 export class ContactsComponent implements OnInit, OnDestroy {
 
-  private sub: Subscription;
+  private contactsSub: Subscription;
+  private contactsChangesSub: Subscription[] = [];
+  private sessionSub: Subscription;
   public contacts: UserWithUID[] = [];
+  public session: Session;
+  public members: (UserWithUID&{ status: SessionMemberStatus })[] = [];
 
   constructor(
     private app: AppService,
@@ -22,7 +26,13 @@ export class ContactsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.sub = this.app.getContacts().subscribe(contacts => {
+    this.contactsSub = this.app.getContacts().subscribe(contacts => {
+
+      for ( const sub of this.contactsChangesSub ) {
+
+        if ( ! sub.closed ) sub.unsubscribe();
+
+      }
 
       if ( ! contacts ) {
 
@@ -31,11 +41,28 @@ export class ContactsComponent implements OnInit, OnDestroy {
 
       }
 
-      this.app.silent(Promise.all(
-        Object.keys(contacts)
-        .map(uid => this.app.silent(this.app.getUser(uid)))
-      ))
-      .then(users => this.contacts = orderBy(users.filter(user => !! user), 'name') || []);
+      this.contacts = this.contacts.filter(contact => Object.keys(contacts).includes(contact.uid));
+
+      for ( const uid in contacts ) {
+
+        this.contactsChangesSub.push(this.app.getUserChanges(uid).subscribe(user => {
+
+          const index = this.contacts.indexOf(this.contacts.find(contact => contact.uid === user.uid));
+
+          if ( index > -1 ) this.contacts[index] = user;
+          else this.contacts = orderBy([...this.contacts, user].filter(user => !! user), 'name');
+
+        }));
+
+      }
+
+    });
+    this.sessionSub = this.app.onSessionChanges(session => {
+
+      this.session = session;
+      this.members = this.contacts
+      .filter(user => Object.keys(this.session.members).includes(user.uid))
+      .map(member => ({ ...member, status: this.session.members[member.uid].status }));
 
     });
 
@@ -77,13 +104,32 @@ export class ContactsComponent implements OnInit, OnDestroy {
 
   onInviteContact(contact: UserWithUID) {
 
-    console.log('invite contact');
+    this.app.openModal(ModalContent.InviteContact, { name: contact.name });
+    this.app.onModalNextState()
+    .then(async state => {
+
+      if ( state.canceled ) return;
+
+      const response = await this.app.createSession(100);
+      await this.app.onResolveOnly(
+        this.app.inviteUser(contact.uid, response.id),
+        () => this.notifications.info(`${contact.name} joined`)
+      );
+
+    });
+
+  }
+
+  onBan(member: UserWithUID) {
+
+    console.log('Banning member', member.name);
 
   }
 
   ngOnDestroy(): void {
 
-    if ( this.sub && ! this.sub.closed ) this.sub.unsubscribe();
+    if ( this.contactsSub && ! this.contactsSub.closed ) this.contactsSub.unsubscribe();
+    if ( this.sessionSub && ! this.sessionSub.closed ) this.sessionSub.unsubscribe();
 
   }
 

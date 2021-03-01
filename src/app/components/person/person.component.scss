@@ -32,6 +32,18 @@
   transition: border-color .2s ease-in-out;
   position: relative;
   cursor: pointer;
+  &.no-pointer {
+    cursor: default;
+  }
+  &.status-ready {
+    border-color: color('green');
+  }
+  &.status-not-ready {
+    border-color: color('blue-light');
+  }
+  &.status-mismatch {
+    border-color: color('yellow');
+  }
   img {
     width: rem(54px);
     height: rem(54px);
@@ -61,6 +73,9 @@
     span.delete-button {
       opacity: 1;
     }
+    span.ban-button {
+      opacity: 1;
+    }
   }
   span.status-indicator {
     @include pill;
@@ -75,6 +90,29 @@
     background-color: color('red-light');
     opacity: 0;
     transition: opacity .2s ease-in-out, transform .2s ease-in-out;
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+  span.ban-button {
+    @include pill;
+    top: 0;
+    left: 0;
+    background-color: color('yellow');
+    opacity: 0;
+    transition: opacity .2s ease-in-out, transform .2s ease-in-out;
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+  span.invitations {
+    @include pill;
+    cursor: pointer;
+    font-size: rem(10px);
+    top: 0;
+    right: 0;
+    background-color: color('blue-light');
+    transition: transform .2s ease-in-out;
     &:hover {
       transform: scale(1.2);
     }

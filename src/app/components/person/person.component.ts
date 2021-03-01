@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Md5 } from 'ts-md5/dist/md5';
-import { User } from '@ash-player/model/database';
+import { UserWithUID, SessionMemberStatus } from '@ash-player/model/database';
 
 @Component({
   selector: 'app-person',
@@ -10,16 +10,31 @@ import { User } from '@ash-player/model/database';
 export class PersonComponent implements OnInit {
 
   @Input('user')
-  public user: User;
+  public user: UserWithUID&{ status?: SessionMemberStatus };
 
   @Input('add-button')
   public addButton: boolean;
+
+  @Input('invitations-count')
+  public invitationsCount: number;
+
+  @Input('current-user')
+  public currentUser: boolean;
+
+  @Input('session-member')
+  public sessionMember: boolean;
 
   @Output('ondelete')
   public onDelete = new EventEmitter<void>();
 
   @Output('onselect')
   public onSelect = new EventEmitter<void>();
+
+  @Output('oninvitations')
+  public onInvitations = new EventEmitter<void>();
+
+  @Output('onban')
+  public onBan = new EventEmitter<void>();
 
   public gravatar: string;
   public gravatarLoaded: boolean = false;
@@ -29,6 +44,8 @@ export class PersonComponent implements OnInit {
   ngOnInit(): void {
 
     this.addButton = this.addButton !== undefined;
+    this.currentUser = this.currentUser !== undefined;
+    this.sessionMember = this.sessionMember !== undefined;
 
     if ( this.user ) {
 

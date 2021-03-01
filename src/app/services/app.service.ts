@@ -3,23 +3,64 @@ import { Router } from '@angular/router';
 import { BackendService } from '@ash-player/service/backend';
 import { FirebaseService } from '@ash-player/service/firebase';
 import { NotificationsService } from '@ash-player/service/notifications';
+import { Invitation, Session } from '@ash-player/model/database';
 import { catchError } from 'rxjs/operators';
-import { throwError, Subject } from 'rxjs';
+import { throwError, Subject, BehaviorSubject, Subscription } from 'rxjs';
+import { cloneDeep } from 'lodash';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
 
+  private _modalState$ = new Subject<ModalState>();
+  private _isModalOpened: boolean = false;
+  private _currentSession: Session = null;
+  private _joinedSessionId: string;
+  private _invitationsSub: Subscription;
+  private _invitations$ = new BehaviorSubject<Invitation[]>([]);
+  private _isHost: boolean;
+  private _sessionChanges$ = new BehaviorSubject<Session>(null);
+  private _statusTimer: NodeJS.Timeout;
+
   constructor(
     private firebase: FirebaseService,
     private backend: BackendService,
     private notifications: NotificationsService,
     private router: Router
-  ) { }
+  ) {
 
-  private _modalState$ = new Subject<ModalState>();
-  private _isModalOpened: boolean = false;
+    this.firebase.onFullAuthStateChanged(async user => {
+
+      if ( ! user ) {
+
+        this.router.navigate(['/auth']);
+        this._invitations$.next([]);
+        this._currentSession = null;
+        this._joinedSessionId = null;
+        this._isHost = false;
+        clearInterval(this._statusTimer);
+
+        if ( this._invitationsSub && ! this._invitationsSub.closed )
+          this._invitationsSub.unsubscribe();
+
+      }
+      else {
+
+        this.router.navigate(['/home']);
+        this._invitationsSub = this._getInvitations().subscribe(invitations => {
+
+          this._invitations$.next(cloneDeep(invitations));
+
+        });
+
+        this._statusTimer = setInterval(async () => await this.silent(this.backend.updateUserStatus(await this.firebase.getToken())), 3000);
+
+      }
+
+    });
+
+  }
 
   private _notifyOnError<T>(promise: Promise<T>): Promise<T> {
 
@@ -35,6 +76,18 @@ export class AppService {
       });
 
     });
+
+  }
+
+  private _getInvitations() {
+
+    return this.firebase.getInvitations()
+    .pipe(catchError(error => {
+
+      this.notifications.error(error.message, error);
+      return throwError(error);
+
+    }));
 
   }
 
@@ -77,12 +130,17 @@ export class AppService {
 
   }
 
+  public get currentSession() { return cloneDeep(this._currentSession); }
+
+  public get isHost() { return this._isHost; }
+
+  public get joinedSessionId() { return this._joinedSessionId; }
+
   public async registerUser(email: string, password: string, name: string) {
 
     await this._notifyOnError(this.firebase.registerUser(email, password));
     await this._notifyOnError(this.backend.registerUser(await this.firebase.getToken(), name));
     await this._notifyOnError(this.firebase.updateCurrentUser());
-    await this.router.navigate(['/home']);
 
   }
 
@@ -121,7 +179,19 @@ export class AppService {
       this.notifications.error(error.message, error);
       return throwError(error);
 
-    }))
+    }));
+
+  }
+
+  public getUserChanges(uid: string) {
+
+    return this.firebase.getUserChanges(uid)
+    .pipe(catchError(error => {
+
+      this.notifications.error(error.message, error);
+      return throwError(error);
+
+    }));
 
   }
 
@@ -145,13 +215,47 @@ export class AppService {
 
   public async createSession(targetLength: number) {
 
-    return this._notifyOnError(this.backend.createSession(await this.firebase.getToken(), targetLength));
+    const res = await this._notifyOnError(this.backend.createSession(await this.firebase.getToken(), targetLength));
+
+    this._currentSession = await this._notifyOnError(this.firebase.getSession(res.id));
+    this._isHost = true;
+    this._sessionChanges$.next(this.currentSession);
+
+    return res;
 
   }
 
   public getUser(uid: string) {
 
     return this._notifyOnError(this.firebase.getUser(uid));
+
+  }
+
+  public async rejectInvitation(invitation: Invitation) {
+
+    return this._notifyOnError(this.backend.rejectUserInvite(await this.firebase.getToken(), invitation.id));
+
+  }
+
+  public async acceptInvitation(invitation: Invitation) {
+
+    const res =  await this._notifyOnError(this.backend.acceptUserInvite(await this.firebase.getToken(), invitation.id));
+
+    this._joinedSessionId = invitation.session;
+
+    return res;
+
+  }
+
+  public getInvitations(observer: (invitations: Invitation[]) => void) {
+
+    return this._invitations$.subscribe(observer);
+
+  }
+
+  public onSessionChanges(observer: (session: Session) => void) {
+
+    return this._sessionChanges$.subscribe(observer);
 
   }
 
@@ -176,30 +280,36 @@ export class AppService {
 
   }
 
-  public openModal(content: ModalContent, data?: any) {
+  public openModal(content: ModalContent, data?: any): boolean {
 
-    if ( this._isModalOpened ) return;
+    if ( this._isModalOpened ) return false;
 
     this._modalState$.next({ content, closed: false, canceled: false, data });
     this._isModalOpened = true;
 
+    return true;
+
   }
 
-  public closeModal(data?: any) {
+  public closeModal(data?: any): boolean {
 
-    if ( ! this._isModalOpened ) return;
+    if ( ! this._isModalOpened ) return false;
 
     this._modalState$.next({ content: ModalContent.NoContent, closed: true, canceled: false, data });
     this._isModalOpened = false;
 
+    return true;
+
   }
 
-  public cancelModal() {
+  public cancelModal(): boolean {
 
-    if ( ! this._isModalOpened ) return;
+    if ( ! this._isModalOpened ) return false;
 
     this._modalState$.next({ content: ModalContent.NoContent, closed: true, canceled: true });
     this._isModalOpened = false;
+
+    return true;
 
   }
 
