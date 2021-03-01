@@ -1,3 +1,5 @@
+@import '../../../util';
+
 :host {
   display: flex;
   flex-direction: column;
@@ -5,4 +7,12 @@
   width: 100%;
   flex-shrink: 1;
   flex-grow: 1;
+  align-items: center;
+  overflow-y: auto;
+  app-person:not(:first-child) {
+    margin-top: rem(20px);
+  }
+  ::-webkit-scrollbar {
+    width: 0;
+  }
 }

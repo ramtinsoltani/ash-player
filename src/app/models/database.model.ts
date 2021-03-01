@@ -5,6 +5,10 @@ export interface User {
   lastTimeOnline: number;
 }
 
+export interface UserWithUID extends User {
+  uid: string;
+}
+
 /** UID as document ID. */
 export interface ContactsList {
   [uid: string]: true;

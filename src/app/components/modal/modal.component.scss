@@ -1,0 +1,28 @@
+@import '../../../util';
+@import '../../../mixins';
+
+.modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  @include glass;
+  .modal {
+    display: flex;
+    width: rem(400px);
+    flex-direction: column;
+    padding: rem(20px);
+    border-radius: rem(5px);
+    background-color: color('gray-medium');
+    @include dropshadow;
+    p {
+      margin-top: 0;
+      margin-bottom: rem(20px);
+    }
+  }
+}

@@ -37,6 +37,12 @@ export class BackendService {
       }
       else {
 
+        if ( error.error.code === 'VALIDATION_FAILED' ) {
+
+          return throwError({ status: error.status, message: 'Invalid request!', originalMessage: error.error.message, code: error.error.code });
+
+        }
+
         return throwError({ status: error.status, message: error.error.message, code: error.error.code });
 
       }

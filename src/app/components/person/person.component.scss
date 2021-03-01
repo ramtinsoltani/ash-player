@@ -1,0 +1,82 @@
+@import '../../../util';
+@import '../../../mixins';
+
+@mixin pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: rem(16px);
+  height: rem(16px);
+  flex-shrink: 0;
+  flex-grow: 0;
+  position: absolute;
+  border-radius: 50%;
+  @include dropshadow;
+  svg {
+    width: rem(8px);
+    height: rem(8px);
+  }
+}
+
+.person {
+  width: rem(60px);
+  height: rem(60px);
+  display: flex;
+  flex-shrink: 0;
+  flex-grow: 0;
+  align-items: center;
+  justify-content: center;
+  background-color: color('gray-dark');
+  border: rem(3px) solid color('gray-medium');
+  border-radius: 50%;
+  transition: border-color .2s ease-in-out;
+  position: relative;
+  cursor: pointer;
+  img {
+    width: rem(54px);
+    height: rem(54px);
+    border-radius: 50%;
+    &.hidden {
+      display: none;
+    }
+  }
+  span.name-letter {
+    font-size: rem(40px);
+  }
+  svg.add-icon {
+    width: rem(24px);
+    height: rem(24px);
+    transition: fill .2s ease-in-out;
+  }
+  &:hover {
+    &.add-button {
+      border-color: color('blue-light');
+    }
+    svg.add-icon {
+      fill: color('blue-light');
+    }
+    span.name-letter {
+      color: color('blue-light');
+    }
+    span.delete-button {
+      opacity: 1;
+    }
+  }
+  span.status-indicator {
+    @include pill;
+    right: 0;
+    bottom: 0;
+    background-color: color('green');
+  }
+  span.delete-button {
+    @include pill;
+    top: 0;
+    left: 0;
+    background-color: color('red-light');
+    opacity: 0;
+    transition: opacity .2s ease-in-out, transform .2s ease-in-out;
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+}

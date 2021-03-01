@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import firebaseCert from '@ash-player/firebase-cert';
-import { ContactsList, User } from '@ash-player/model/database';
+import { ContactsList, UserWithUID } from '@ash-player/model/database';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
@@ -15,7 +15,8 @@ type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
 })
 export class FirebaseService {
 
-  private _currentUser: User = null;
+  private _currentUser: UserWithUID = null;
+  private _newUser: boolean = false;
 
   constructor(
     private router: Router
@@ -25,16 +26,20 @@ export class FirebaseService {
 
     firebase.auth().onAuthStateChanged(user => {
 
-      if ( ! user ) this.router.navigate(['/auth']);
+      if ( ! user ) {
+
+        this.updateCurrentUser()
+        .then(() => this.router.navigate(['/auth']))
+        .catch(error => console.error(error));;
+
+      }
       else {
 
-        this.getCurrentUser()
-        .then(user => {
+        // If user was just registered, the user document might not be written yet
+        if ( this._newUser ) return;
 
-          this._currentUser = user;
-          this.router.navigate(['/home']);
-
-        })
+        this.updateCurrentUser()
+        .then(() => this.router.navigate(['/home']))
         .catch(error => console.error(error));
 
       }
@@ -43,24 +48,25 @@ export class FirebaseService {
 
   }
 
-  private async getCurrentUser() {
+  public get currentUser() { return cloneDeep(this._currentUser); }
 
-    if ( ! firebase.auth().currentUser ) return null;
+  public async updateCurrentUser() {
 
-    const userDoc = await firebase.firestore()
-    .collection('users')
-    .doc(firebase.auth().currentUser.uid)
-    .get();
+    if ( ! firebase.auth().currentUser ) {
 
-    if ( ! userDoc.exists ) throw new Error('User does not exist!');
+      this._currentUser = null;
+      return;
 
-    return userDoc.data() as User;
+    }
+
+    this._currentUser = await this.getUser(firebase.auth().currentUser.uid);
+    this._newUser = false;
 
   }
 
-  public get currentUser() { return cloneDeep(this._currentUser); }
-
   public async registerUser(email: string, password: string) {
+
+    this._newUser = true;
 
     await firebase.auth().createUserWithEmailAndPassword(email, password);
 
@@ -75,6 +81,7 @@ export class FirebaseService {
   public async logout() {
 
     await firebase.auth().signOut();
+    await this.updateCurrentUser();
 
   }
 
@@ -111,12 +118,7 @@ export class FirebaseService {
       );
 
       // On unsubscribe
-      observer.add(() => {
-
-        console.log('Unsubscribed')
-        unsubscribe();
-
-      });
+      observer.add(unsubscribe);
 
     });
 
@@ -128,7 +130,9 @@ export class FirebaseService {
 
       const user = await firebase.firestore().collection('users').doc(uid).get();
 
-      return user.data() as User;
+      if ( ! user.exists ) throw new Error('User does not exist!');
+
+      return { ...user.data(), uid } as UserWithUID;
 
     }
     catch (error) {

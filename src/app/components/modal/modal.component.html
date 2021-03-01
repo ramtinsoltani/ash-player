@@ -1,1 +1,33 @@
-<p>modal works!</p>
+<div *ngIf="! state.closed" @fade class="modal-container">
+  <div @expand class="modal">
+    <ng-template [ngIf]="state.content === modalContent.AddContact">
+      <h3>Add Contact</h3>
+      <hr>
+      <form #addContactForm="ngForm" (ngSubmit)="onAddContact(addContactForm)">
+        <input type="email" name="email" ngModel required email placeholder="Email" class="dark">
+        <div class="button-group">
+          <button type="button" name="cancelButton" class="button-secondary half-width" (click)="onCancel()">Cancel</button>
+          <button type="submit" name="addContactButton" class="button-primary half-width" [disabled]="addContactForm.invalid">Add</button>
+        </div>
+      </form>
+    </ng-template>
+    <ng-template [ngIf]="state.content === modalContent.RemoveContact">
+      <h3>Remove Contact</h3>
+      <hr>
+      <p>Remove <span class="color-accent">{{ state.data.name }}</span> from your contacts list?</p>
+      <div class="button-group">
+        <button type="button" name="cancelButton" class="button-secondary half-width" (click)="onCancel()">Cancel</button>
+        <button type="button" name="confirmButton" class="button-danger half-width" (click)="onConfirm()">Remove</button>
+      </div>
+    </ng-template>
+    <ng-template [ngIf]="state.content === modalContent.DeleteAccount">
+      <h3>Delete Account</h3>
+      <hr>
+      <p>You are about to <span class="color-danger">completely delete</span> your account! Bear in mind that this action <span class="color-danger">cannot be undone</span>. Proceed?</p>
+      <div class="button-group">
+        <button type="button" name="cancelButton" class="button-secondary half-width" (click)="onCancel()">Cancel</button>
+        <button type="button" name="confirmButton" class="button-danger half-width" (click)="onConfirm()">Proceed</button>
+      </div>
+    </ng-template>
+  </div>
+</div>

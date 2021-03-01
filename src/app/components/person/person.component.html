@@ -1,1 +1,15 @@
-<p>person works!</p>
+<div class="person" (click)="onSelect.emit()" [ngClass]="{ 'add-button': addButton }">
+  <ng-template [ngIf]="! addButton">
+    <img [src]="gravatar" (load)="onGravatarLoaded()" [ngClass]="{ hidden: ! gravatarLoaded }">
+    <span *ngIf="! gravatarLoaded" class="name-letter">{{ user.name.substr(0, 1).toUpperCase() }}</span>
+    <span *ngIf="hasPersonBeenRecentlyOnline()" class="status-indicator"></span>
+    <span class="delete-button" (click)="onPersonDelete($event)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" class="color-white">
+        <path d="M5.516,84l2.274-2.274a.715.715,0,0,0,0-1.011l-.505-.505a.715.715,0,0,0-1.011,0L4,82.484,1.726,80.209a.715.715,0,0,0-1.011,0l-.505.505a.715.715,0,0,0,0,1.011L2.484,84,.209,86.274a.715.715,0,0,0,0,1.011l.505.505a.715.715,0,0,0,1.011,0L4,85.516l2.274,2.274a.715.715,0,0,0,1.011,0l.505-.505a.715.715,0,0,0,0-1.011Z" transform="translate(0 -80)"/>
+      </svg>
+    </span>
+  </ng-template>
+  <svg *ngIf="addButton" class="add-icon color-white" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <path d="M22.286,41.429H14.571V33.714A1.714,1.714,0,0,0,12.857,32H11.143a1.714,1.714,0,0,0-1.714,1.714v7.714H1.714A1.715,1.715,0,0,0,0,43.143v1.714a1.714,1.714,0,0,0,1.714,1.714H9.429v7.714A1.714,1.714,0,0,0,11.143,56h1.714a1.714,1.714,0,0,0,1.714-1.714V46.571h7.714A1.714,1.714,0,0,0,24,44.857V43.143A1.715,1.715,0,0,0,22.286,41.429Z" transform="translate(0 -32)"/>
+  </svg>
+</div>

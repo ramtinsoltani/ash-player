@@ -1,1 +1,2 @@
-<span *ngFor="let contact of contacts">{{ contact.name }}</span>
+<app-person add-button (onselect)="onAddContact()"></app-person>
+<app-person *ngFor="let contact of contacts" [user]="contact" (onselect)="onInviteContact(contact)" (ondelete)="onDeleteContact(contact)"></app-person>
