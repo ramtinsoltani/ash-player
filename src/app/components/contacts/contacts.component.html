@@ -1,6 +1,6 @@
 <ng-template [ngIf]="! session || ! session.started">
-  <app-person add-button (onselect)="onAddContact()"></app-person>
-  <app-person *ngFor="let contact of contacts" [user]="contact" (onselect)="onInviteContact(contact)" (ondelete)="onDeleteContact(contact)"></app-person>
+  <app-person add-button selectable (onselect)="onAddContact()"></app-person>
+  <app-person *ngFor="let contact of contacts" [selectable]="!! session" [user]="contact" (onselect)="onInviteContact(contact)" (ondelete)="onDeleteContact(contact)"></app-person>
 </ng-template>
 <ng-template [ngIf]="session && session.started">
   <app-person *ngFor="let member of members" [user]="member" session-member (onban)="onBan(member)"></app-person>

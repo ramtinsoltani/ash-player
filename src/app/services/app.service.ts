@@ -6,7 +6,7 @@ import { NotificationsService } from '@ash-player/service/notifications';
 import { Invitation, Session } from '@ash-player/model/database';
 import { catchError } from 'rxjs/operators';
 import { throwError, Subject, BehaviorSubject, Subscription } from 'rxjs';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 
 @Injectable({
   providedIn: 'root'
@@ -215,6 +215,8 @@ export class AppService {
 
   public async createSession(targetLength: number) {
 
+    if ( this._currentSession ) throw new Error(`Session is already in progress!`);
+
     const res = await this._notifyOnError(this.backend.createSession(await this.firebase.getToken(), targetLength));
 
     this._currentSession = await this._notifyOnError(this.firebase.getSession(res.id));
@@ -310,6 +312,12 @@ export class AppService {
     this._isModalOpened = false;
 
     return true;
+
+  }
+
+  public async cleanup() {
+
+    
 
   }
 

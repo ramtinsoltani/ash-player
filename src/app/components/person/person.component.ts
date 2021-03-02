@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Md5 } from 'ts-md5/dist/md5';
-import { UserWithUID, SessionMemberStatus } from '@ash-player/model/database';
+import { User, SessionMemberStatus } from '@ash-player/model/database';
 
 @Component({
   selector: 'app-person',
@@ -10,7 +10,7 @@ import { UserWithUID, SessionMemberStatus } from '@ash-player/model/database';
 export class PersonComponent implements OnInit {
 
   @Input('user')
-  public user: UserWithUID&{ status?: SessionMemberStatus };
+  public user: User & { status?: SessionMemberStatus };
 
   @Input('add-button')
   public addButton: boolean;
@@ -23,6 +23,9 @@ export class PersonComponent implements OnInit {
 
   @Input('session-member')
   public sessionMember: boolean;
+
+  @Input('selectable')
+  public selectable: boolean;
 
   @Output('ondelete')
   public onDelete = new EventEmitter<void>();
@@ -41,11 +44,18 @@ export class PersonComponent implements OnInit {
 
   constructor() { }
 
+  private sanitizeBoolean(value: any) {
+
+    return typeof value !== 'boolean' ? value !== undefined : value;
+
+  }
+
   ngOnInit(): void {
 
-    this.addButton = this.addButton !== undefined;
-    this.currentUser = this.currentUser !== undefined;
-    this.sessionMember = this.sessionMember !== undefined;
+    this.addButton = this.sanitizeBoolean(this.addButton);
+    this.sessionMember = this.sanitizeBoolean(this.sessionMember);
+    this.currentUser = this.sanitizeBoolean(this.currentUser);
+    this.selectable = this.sanitizeBoolean(this.selectable);
 
     if ( this.user ) {
 
@@ -72,6 +82,14 @@ export class PersonComponent implements OnInit {
     event.stopImmediatePropagation();
 
     this.onDelete.emit();
+
+  }
+
+  onPersonSelect() {
+
+    if ( ! this.selectable ) return;
+
+    this.onSelect.emit();
 
   }
 

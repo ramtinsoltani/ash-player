@@ -67,7 +67,7 @@
     svg.add-icon {
       fill: color('blue-light');
     }
-    span.name-letter {
+    &:not(.no-pointer) span.name-letter {
       color: color('blue-light');
     }
     span.delete-button {
@@ -85,6 +85,7 @@
   }
   span.delete-button {
     @include pill;
+    cursor: pointer;
     top: 0;
     left: 0;
     background-color: color('red-light');
@@ -96,6 +97,7 @@
   }
   span.ban-button {
     @include pill;
+    cursor: pointer;
     top: 0;
     left: 0;
     background-color: color('yellow');

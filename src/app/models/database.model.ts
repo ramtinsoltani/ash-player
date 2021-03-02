@@ -1,12 +1,9 @@
 /** UID as document ID. */
 export interface User {
+  id: string;
   name: string;
   email: string;
   lastTimeOnline: number;
-}
-
-export interface UserWithUID extends User {
-  uid: string;
 }
 
 /** UID as document ID. */
@@ -22,6 +19,7 @@ export interface Invitation {
 }
 
 export interface Session {
+  id: string;
   host: string;
   started: boolean;
   signal?: SessionStaticSignal|SessionTimeSignal;

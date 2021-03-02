@@ -1,6 +1,6 @@
-<div class="person" (click)="onSelect.emit()" [ngClass]="{
+<div class="person" (click)="onPersonSelect()" [ngClass]="{
   'add-button': addButton,
-  'no-pointer': currentUser || sessionMember,
+  'no-pointer': currentUser || sessionMember || ! selectable,
   'status-not-ready': sessionMember && user.status === 'not-ready',
   'status-ready': sessionMember && user.status === 'ready',
   'status-mismatch': sessionMember && user.status === 'mismatch'

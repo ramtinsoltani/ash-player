@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import firebaseCert from '@ash-player/firebase-cert';
-import { ContactsList, UserWithUID, Invitation, Session } from '@ash-player/model/database';
+import { ContactsList, User, Invitation, Session } from '@ash-player/model/database';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 
 type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
 type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>;
@@ -15,9 +15,9 @@ type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>;
 })
 export class FirebaseService {
 
-  private _currentUser: UserWithUID = null;
+  private _currentUser: User = null;
   private _newUser: boolean = false;
-  private _onFullAuthStateChanged$ = new Subject<UserWithUID>();
+  private _onFullAuthStateChanged$ = new Subject<User>();
 
   constructor() {
 
@@ -35,7 +35,7 @@ export class FirebaseService {
 
   }
 
-  public onFullAuthStateChanged(observer: (user: UserWithUID) => void) {
+  public onFullAuthStateChanged(observer: (user: User) => void) {
 
     return this._onFullAuthStateChanged$.subscribe(observer);
 
@@ -125,7 +125,7 @@ export class FirebaseService {
 
       const unsubscribe = firebase.firestore()
       .collection('invitations')
-      .where('to', '==', this.currentUser.uid)
+      .where('to', '==', this.currentUser.id)
       .onSnapshot(
         (query: QuerySnapshot<Invitation>) => {
 
@@ -152,7 +152,7 @@ export class FirebaseService {
 
       if ( ! user.exists ) throw new Error('User does not exist!');
 
-      return { ...user.data(), uid } as UserWithUID;
+      return { ...user.data(), id: uid } as User;
 
     }
     catch (error) {
@@ -165,13 +165,13 @@ export class FirebaseService {
 
   public getUserChanges(uid: string) {
 
-    return new Observable<UserWithUID>(observer => {
+    return new Observable<User>(observer => {
 
       const unsubscribe = firebase.firestore()
       .collection('users')
       .doc(uid)
       .onSnapshot(
-        (doc: DocumentSnapshot<UserWithUID>) => observer.next({ ...doc.data(), uid: doc.id }),
+        (doc: DocumentSnapshot<User>) => observer.next({ ...doc.data(), id: doc.id }),
         observer.error
       );
 
@@ -190,7 +190,7 @@ export class FirebaseService {
 
       if ( ! session.exists ) throw new Error('Session does not exist!');
 
-      return session.data() as Session;
+      return { ...session.data(), id } as Session;
 
     }
     catch (error) {

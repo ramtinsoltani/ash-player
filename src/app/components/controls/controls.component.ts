@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angu
 import { AppService, ModalContent } from '@ash-player/service/app';
 import { NotificationsService } from '@ash-player/service/notifications';
 import { FirebaseService } from '@ash-player/service/firebase';
-import { Invitation, UserWithUID } from '@ash-player/model/database';
+import { Invitation, User } from '@ash-player/model/database';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -31,7 +31,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
   public onLogout = new EventEmitter<void>();
 
   public invitations: Invitation[] = [];
-  public currentUser: UserWithUID;
+  public currentUser: User;
   private sub: Subscription;
 
   constructor(
