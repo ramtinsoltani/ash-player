@@ -29,6 +29,12 @@ export class NotificationsService {
 
   }
 
+  public debug(message: string, ...additionalMessages: any[]) {
+
+    console.debug(message, ...additionalMessages);
+
+  }
+
   public info(message: string, ...additionalMessages: any[]) {
 
     this.notifications$.next({ type: NotificationType.Info, message, additionalMessages });

@@ -3,18 +3,27 @@
   "version": "0.0.0",
   "description": "Social Video Player",
   "scripts": {
-    "ng": "ng",
-    "start": "ng build && npx tsc --project tsconfig.electron.json && npx electron .",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "preinstall": "node prepare-webchimera.js",
+    "postinstall": "electron-builder install-app-deps",
+    "start": "ng build --aot --prod && npx tsc --project tsconfig.electron.json && npx electron .",
+    "pack": "npx electron-builder --dir",
+    "dist": "npx electron-builder"
+  },
+  "build": {
+    "appId": "com.electron.ashplayer",
+    "productName": "AshPlayer",
+    "asar": false,
+    "mac": {
+      "category": "public.app-category.video",
+      "target": "dmg"
+    }
   },
   "private": true,
-  "main": "dist/main.js",
+  "main": "main.js",
   "author": "Ramtin Soltani <ramtinsoltani93@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "webchimera.js": "file:webchimera.js",
     "@angular/animations": "~11.2.1",
     "@angular/common": "~11.2.1",
     "@angular/compiler": "~11.2.1",
@@ -28,16 +37,20 @@
     "rxjs": "~6.6.0",
     "ts-md5": "^1.2.7",
     "tslib": "^2.0.0",
+    "webgl-video-renderer": "^0.2.0",
     "zone.js": "~0.11.3"
   },
   "devDependencies": {
+    "@angular-builders/custom-webpack": "^11.1.0",
     "@angular-devkit/build-angular": "~0.1102.1",
     "@angular/cli": "~11.2.1",
     "@angular/compiler-cli": "~11.2.1",
     "@types/lodash-es": "^4.17.4",
     "@types/node": "^12.20.4",
     "codelyzer": "^6.0.0",
+    "decompress": "^4.2.1",
     "electron": "^11.3.0",
+    "electron-builder": "^22.10.5",
     "source-map-support": "^0.5.19",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",

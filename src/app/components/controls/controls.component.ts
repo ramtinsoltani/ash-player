@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angu
 import { AppService, ModalContent } from '@ash-player/service/app';
 import { NotificationsService } from '@ash-player/service/notifications';
 import { FirebaseService } from '@ash-player/service/firebase';
-import { Invitation, User } from '@ash-player/model/database';
+import { Invitation, User, SessionMemberStatus } from '@ash-player/model/database';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -32,7 +32,10 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   public invitations: Invitation[] = [];
   public currentUser: User;
-  private sub: Subscription;
+  public status: SessionMemberStatus;
+
+  private sessionSub: Subscription;
+  private invitationsSub: Subscription;
 
   constructor(
     private app: AppService,
@@ -45,7 +48,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
     this.showOptions = this.showOptions !== undefined;
     this.showLogout = this.showLogout !== undefined;
 
-    this.sub = this.app.getInvitations(invitations => {
+    this.invitationsSub = this.app.getInvitations(invitations => {
 
       this.invitations = invitations;
 
@@ -53,11 +56,22 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
     this.currentUser = this.firebase.currentUser;
 
+    this.sessionSub = this.app.onSessionChanges(() => {
+
+      if ( this.app.isHost ) this.status = SessionMemberStatus.Ready;
+      else this.status = this.app.sessionMemberStatus;
+
+    });
+
   }
 
   ngOnDestroy(): void {
 
-    if ( this.sub && ! this.sub.closed ) this.sub.unsubscribe();
+    if ( this.invitationsSub && ! this.invitationsSub.closed )
+      this.invitationsSub.unsubscribe();
+
+    if ( this.sessionSub && ! this.sessionSub.closed )
+      this.sessionSub.unsubscribe();
 
   }
 

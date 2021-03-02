@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { BackendService } from '@ash-player/service/backend';
 import { FirebaseService } from '@ash-player/service/firebase';
 import { NotificationsService } from '@ash-player/service/notifications';
-import { Invitation, Session } from '@ash-player/model/database';
+import { Invitation, Session, SessionMemberStatus, SessionStaticSignal } from '@ash-player/model/database';
 import { catchError } from 'rxjs/operators';
-import { throwError, Subject, BehaviorSubject, Subscription } from 'rxjs';
+import { throwError, Subject, BehaviorSubject, Subscription, Observable } from 'rxjs';
 import { cloneDeep } from 'lodash-es';
 
 @Injectable({
@@ -16,12 +16,15 @@ export class AppService {
   private _modalState$ = new Subject<ModalState>();
   private _isModalOpened: boolean = false;
   private _currentSession: Session = null;
+  private _firestoreSessionChanges$: Observable<Session>;
+  private _firestoreSessionChangesSub: Subscription;
   private _joinedSessionId: string;
   private _invitationsSub: Subscription;
   private _invitations$ = new BehaviorSubject<Invitation[]>([]);
   private _isHost: boolean;
   private _sessionChanges$ = new BehaviorSubject<Session>(null);
   private _statusTimer: NodeJS.Timeout;
+  private _sessionMemberStatus: SessionMemberStatus;
 
   constructor(
     private firebase: FirebaseService,
@@ -36,9 +39,7 @@ export class AppService {
 
         this.router.navigate(['/auth']);
         this._invitations$.next([]);
-        this._currentSession = null;
-        this._joinedSessionId = null;
-        this._isHost = false;
+        await this.silent(this.sessionCleanup());
         clearInterval(this._statusTimer);
 
         if ( this._invitationsSub && ! this._invitationsSub.closed )
@@ -54,7 +55,9 @@ export class AppService {
 
         });
 
-        this._statusTimer = setInterval(async () => await this.silent(this.backend.updateUserStatus(await this.firebase.getToken())), 3000);
+        await this.silent(this.backend.updateUserStatus(await this.firebase.getToken()));
+
+        this._statusTimer = setInterval(async () => await this.silent(this.backend.updateUserStatus(await this.firebase.getToken())), 10000);
 
       }
 
@@ -88,6 +91,39 @@ export class AppService {
       return throwError(error);
 
     }));
+
+  }
+
+  private _throwError(error: Error) {
+
+    this.notifications.error(error.message, error);
+    throw error;
+
+  }
+
+  private async _subscribeToSession(id?: string) {
+
+    if ( ! this._firestoreSessionChanges$ ) {
+
+      this._firestoreSessionChanges$ = this.firebase.getSessionChanges(id)
+      .pipe(catchError(error => {
+
+        this.notifications.error(error.message, error);
+        return throwError(error);
+
+      }));
+
+    }
+
+    this._firestoreSessionChangesSub = this._firestoreSessionChanges$.subscribe(async session => {
+
+      this._currentSession = session;
+      this._sessionChanges$.next(this.currentSession);
+
+      if ( session.signal === SessionStaticSignal.End )
+        await this.silent(this.clearSessionChanges());
+
+    });
 
   }
 
@@ -130,11 +166,15 @@ export class AppService {
 
   }
 
+  public get currentUser() { return cloneDeep(this.firebase.currentUser); }
+
   public get currentSession() { return cloneDeep(this._currentSession); }
 
   public get isHost() { return this._isHost; }
 
   public get joinedSessionId() { return this._joinedSessionId; }
+
+  public get sessionMemberStatus() { return this._sessionMemberStatus; }
 
   public async registerUser(email: string, password: string, name: string) {
 
@@ -215,13 +255,15 @@ export class AppService {
 
   public async createSession(targetLength: number) {
 
-    if ( this._currentSession ) throw new Error(`Session is already in progress!`);
+    if ( this._currentSession ) this._throwError(new Error(`Session is already in progress!`));
 
     const res = await this._notifyOnError(this.backend.createSession(await this.firebase.getToken(), targetLength));
 
-    this._currentSession = await this._notifyOnError(this.firebase.getSession(res.id));
     this._isHost = true;
-    this._sessionChanges$.next(this.currentSession);
+
+    await this._subscribeToSession(res.id);
+
+    this.notifications.info('Session created');
 
     return res;
 
@@ -244,6 +286,9 @@ export class AppService {
     const res =  await this._notifyOnError(this.backend.acceptUserInvite(await this.firebase.getToken(), invitation.id));
 
     this._joinedSessionId = invitation.session;
+    this._sessionMemberStatus = SessionMemberStatus.NotReady;
+    this._sessionChanges$.next(null);
+    this.notifications.info(`Please select the same video file as the session host`);
 
     return res;
 
@@ -258,6 +303,60 @@ export class AppService {
   public onSessionChanges(observer: (session: Session) => void) {
 
     return this._sessionChanges$.subscribe(observer);
+
+  }
+
+  public async clearSessionChanges(silent?: boolean, leave?: boolean) {
+
+    if ( ! this._currentSession ) {
+
+      if ( silent ) return;
+
+      this._throwError(new Error('No session in progress!'));
+
+    }
+
+    if ( this._firestoreSessionChangesSub && ! this._firestoreSessionChangesSub.closed )
+      this._firestoreSessionChangesSub.unsubscribe();
+
+    this._firestoreSessionChanges$ = null;
+    this._currentSession = null;
+    this._isHost = false;
+    this._joinedSessionId = null;
+    this._sessionChanges$.next(null);
+
+    // Leave session in backend
+    if ( leave ) {
+
+
+
+    }
+
+  }
+
+  public async updateSessionTargetLength(targetLength: number) {
+
+    if ( ! this._currentSession && ! this._joinedSessionId )
+      this._throwError(new Error('No session in progress!'));
+
+    if ( this._isHost )
+      this._throwError(new Error('Host cannot update the video once session has started!'));
+
+    if ( this._sessionMemberStatus === SessionMemberStatus.Ready )
+      this._throwError(new Error('Cannot update the video once a matching video is selected!'));
+
+    const res = await this._notifyOnError(this.backend.updateSession(
+      await this.firebase.getToken(),
+      this._currentSession?.id || this._joinedSessionId,
+      targetLength
+    ));
+
+    this._sessionMemberStatus = <any>res.status;
+
+    if ( ! this._firestoreSessionChangesSub )
+      await this._subscribeToSession(this._currentSession?.id || this._joinedSessionId);
+
+    return res;
 
   }
 
@@ -315,9 +414,9 @@ export class AppService {
 
   }
 
-  public async cleanup() {
+  public async sessionCleanup() {
 
-    
+    await this.silent(this.clearSessionChanges(true, true));
 
   }
 

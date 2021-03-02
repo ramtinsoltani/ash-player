@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { ipcRenderer } from 'electron';
+import { NotificationsService } from '@ash-player/service/notifications';
+import { ShowOpenDialogResult } from '@ash-player/model/electron';
 
 @Component({
   selector: 'app-source-select',
@@ -7,9 +10,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SourceSelectComponent implements OnInit {
 
-  constructor() { }
+  @Output('onsource')
+  public onSource = new EventEmitter<string>();
 
-  ngOnInit(): void {
+  constructor(
+    private notifications: NotificationsService
+  ) { }
+
+  ngOnInit(): void { }
+
+  onVideoSelect() {
+console.log('onVideoSelect');
+    ipcRenderer.invoke('showOpenDialog')
+    .then((result: ShowOpenDialogResult) => {
+console.log(result);
+      if ( ! result.canceled && result.filePaths.length )
+        this.onSource.emit(result.filePaths[0]);
+
+    })
+    .catch(error => this.notifications.error(error.message, error));
+
   }
 
 }

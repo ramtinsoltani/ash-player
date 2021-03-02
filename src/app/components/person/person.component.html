@@ -1,9 +1,9 @@
 <div class="person" (click)="onPersonSelect()" [ngClass]="{
   'add-button': addButton,
   'no-pointer': currentUser || sessionMember || ! selectable,
-  'status-not-ready': sessionMember && user.status === 'not-ready',
-  'status-ready': sessionMember && user.status === 'ready',
-  'status-mismatch': sessionMember && user.status === 'mismatch'
+  'status-not-ready': forceStatus === 'not-ready' || (sessionMember && user.status === 'not-ready'),
+  'status-ready': forceStatus === 'ready' || (sessionMember && user.status === 'ready'),
+  'status-mismatch': forceStatus === 'mismatch' || (sessionMember && user.status === 'mismatch')
 }">
   <ng-template [ngIf]="! addButton">
     <img [src]="gravatar" (load)="onGravatarLoaded()" [ngClass]="{ hidden: ! gravatarLoaded }">

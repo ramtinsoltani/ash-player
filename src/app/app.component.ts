@@ -55,7 +55,7 @@ export class AppComponent {
   @HostListener('window:beforeunload')
   async beforeWindowUnload() {
 
-    await this.app.cleanup();
+    await this.app.sessionCleanup();
 
   }
 

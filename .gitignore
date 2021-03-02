@@ -45,7 +45,8 @@ testem.log
 .DS_Store
 Thumbs.db
 
-**.js
-**.js.map
+main.js
+main.js.map
 firebase.cert.json
 app.config.json
+/webchimera.js

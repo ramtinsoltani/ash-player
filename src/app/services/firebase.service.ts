@@ -201,4 +201,23 @@ export class FirebaseService {
 
   }
 
+  public getSessionChanges(id: string) {
+
+    return new Observable<Session>(observer => {
+
+      const unsubscribe = firebase.firestore()
+      .collection('sessions')
+      .doc(id)
+      .onSnapshot(
+        (doc: DocumentSnapshot<Session>) => observer.next({ ...doc.data(), id: doc.id }),
+        observer.error
+      );
+
+      // On unsubscribe
+      observer.add(unsubscribe);
+
+    });
+
+  }
+
 }

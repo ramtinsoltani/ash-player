@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "dist",
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
@@ -9,6 +8,9 @@
     "moduleResolution": "node",
     "target": "es2015",
     "module": "commonjs",
+    "types": [
+      "node"
+    ],
     "lib": [
       "es2018",
       "dom"

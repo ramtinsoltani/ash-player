@@ -1,3 +1,5 @@
+@import '../../../util';
+
 :host {
   display: flex;
   flex-grow: 1;
@@ -6,4 +8,47 @@
   height: 100%;
   align-items: center;
   justify-content: center;
+  padding: rem(20px);
+}
+
+.source-option {
+  display: flex;
+  width: 100%;
+  max-width: rem(500px);
+  cursor: pointer;
+  color: color('gray-light');
+  fill: color('gray-light');
+  transition: fill .2s ease-in-out, color .2s ease-in-out;
+  padding: rem(10px);
+  &:not(:first-child) {
+    margin-top: rem(30px);
+  }
+  &:hover {
+    color: color('blue-light');
+    fill: color('blue-light');
+  }
+  .option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: rem(100px);
+    height: rem(100px);
+    margin-right: rem(20px);
+    svg {
+      height: 100%;
+      width: auto;
+    }
+  }
+  .option-desc {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .option-desc-title {
+      font-size: rem(28px);
+      text-transform: uppercase;
+    }
+    .option-desc-text {
+      font-size: rem(18px);
+    }
+  }
 }

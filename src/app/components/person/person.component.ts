@@ -27,6 +27,9 @@ export class PersonComponent implements OnInit {
   @Input('selectable')
   public selectable: boolean;
 
+  @Input('force-status')
+  public forceStatus: SessionMemberStatus;
+
   @Output('ondelete')
   public onDelete = new EventEmitter<void>();
 
@@ -73,7 +76,7 @@ export class PersonComponent implements OnInit {
 
   hasPersonBeenRecentlyOnline() {
 
-    return Date.now() - this.user.lastTimeOnline < 5000;
+    return Date.now() - this.user.lastTimeOnline < 12000;
 
   }
 
