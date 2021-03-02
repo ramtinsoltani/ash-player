@@ -37,23 +37,26 @@ export class AppService {
 
       if ( ! user ) {
 
-        this.router.navigate(['/auth']);
         this._invitations$.next([]);
-        await this.silent(this.sessionCleanup());
         clearInterval(this._statusTimer);
 
         if ( this._invitationsSub && ! this._invitationsSub.closed )
           this._invitationsSub.unsubscribe();
 
+        await this.router.navigate(['/auth']);
+
       }
       else {
 
-        this.router.navigate(['/home']);
+        if ( user.founder ) this.notifications.secret('Welcome to the app your majesty!');
+
         this._invitationsSub = this._getInvitations().subscribe(invitations => {
 
           this._invitations$.next(cloneDeep(invitations));
 
         });
+
+        await this.router.navigate(['/home']);
 
         await this.silent(this.backend.updateUserStatus(await this.firebase.getToken()));
 
@@ -188,6 +191,9 @@ export class AppService {
 
     const token = await this.firebase.getToken();
 
+    await this.silent(this.sessionCleanup());
+    clearInterval(this._statusTimer);
+
     await this._notifyOnError(this.backend.deleteUser(token));
     await this.silent(this.firebase.refreshUser());
 
@@ -207,6 +213,7 @@ export class AppService {
 
   public async logout() {
 
+    await this.silent(this.sessionCleanup());
     await this._notifyOnError(this.firebase.logout());
 
   }

@@ -4,6 +4,7 @@ export interface User {
   name: string;
   email: string;
   lastTimeOnline: number;
+  founder?: boolean;
 }
 
 /** UID as document ID. */

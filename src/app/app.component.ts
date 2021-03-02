@@ -23,6 +23,8 @@ export class AppComponent {
   @HostListener('window.keydown.ctrl.delete')
   onDeleteAccount() {
 
+    if ( this.app.currentSession || this.app.joinedSessionId ) return;
+
     this.shortcutCount++;
 
     if ( this.lastShortcutTime && (Date.now() - this.lastShortcutTime) > 1000 )

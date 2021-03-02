@@ -49,6 +49,15 @@ export class ContactsComponent implements OnInit, OnDestroy {
         this.contactsChangesSub.push(this.app.getUserChanges(uid).subscribe(user => {
 
           const index = this.contacts.indexOf(this.contacts.find(contact => contact.id === user.id));
+          const deleted: boolean = ! user.email;
+
+          // If user was deleted
+          if ( deleted ) {
+
+            if ( index > -1 ) this.contacts.splice(index, 1);
+            return;
+
+          }
 
           if ( index > -1 ) this.contacts[index] = { ...user, status: this.contacts[index].status };
           else this.contacts = orderBy([...this.contacts, user].filter(user => !! user), 'name');

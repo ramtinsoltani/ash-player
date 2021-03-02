@@ -40,7 +40,15 @@
   &.success {
     border-color: color('green');
   }
+  &.secret {
+    border-color: color('magenta');
+  }
   &:not(:first-child) {
     margin-top: rem(10px);
+  }
+  svg.icon {
+    width: rem(20px);
+    margin-right: rem(10px);
+    fill: color('magenta');
   }
 }

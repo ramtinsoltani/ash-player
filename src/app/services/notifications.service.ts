@@ -59,6 +59,12 @@ export class NotificationsService {
 
   }
 
+  public secret(message: string) {
+
+    this.notifications$.next({ type: NotificationType.Secret, message, additionalMessages: [] });
+
+  }
+
 }
 
 export interface Notification {
@@ -71,5 +77,6 @@ export enum NotificationType {
   Info = 'info',
   Warning = 'warning',
   Error = 'error',
-  Success = 'success'
+  Success = 'success',
+  Secret = 'secret'
 }
