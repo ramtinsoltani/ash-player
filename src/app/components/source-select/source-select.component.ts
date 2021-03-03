@@ -20,10 +20,10 @@ export class SourceSelectComponent implements OnInit {
   ngOnInit(): void { }
 
   onVideoSelect() {
-console.log('onVideoSelect');
+
     ipcRenderer.invoke('showOpenDialog')
     .then((result: ShowOpenDialogResult) => {
-console.log(result);
+
       if ( ! result.canceled && result.filePaths.length )
         this.onSource.emit(result.filePaths[0]);
 

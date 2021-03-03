@@ -360,8 +360,14 @@ export class AppService {
 
     this._sessionMemberStatus = <any>res.status;
 
-    if ( ! this._firestoreSessionChangesSub )
-      await this._subscribeToSession(this._currentSession?.id || this._joinedSessionId);
+    if ( res.status === SessionMemberStatus.Ready ) {
+
+      if ( ! this._firestoreSessionChangesSub )
+        await this._subscribeToSession(this._currentSession?.id || this._joinedSessionId);
+
+    }
+
+    this._sessionChanges$.next(this._currentSession);
 
     return res;
 
