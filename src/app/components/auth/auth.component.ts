@@ -35,16 +35,6 @@ export class AuthComponent implements OnInit {
     this.cursorWidth = (<HTMLDivElement>event.target).offsetWidth;
     this.selectedTab = tabName;
 
-    const tabsCount = (<HTMLDivElement>event.target).parentElement.children.length;
-
-    for ( let i = 0; i < tabsCount; i++ ) {
-
-      (<HTMLDivElement>event.target).parentElement.children.item(i).classList.remove('selected');
-
-    }
-
-    (<HTMLDivElement>event.target).classList.add('selected');
-
   }
 
   public onLogin(form: NgForm) {
