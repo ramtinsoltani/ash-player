@@ -189,6 +189,12 @@ export class ContactsComponent implements OnInit, OnDestroy {
     if ( this.contactsSub && ! this.contactsSub.closed ) this.contactsSub.unsubscribe();
     if ( this.sessionSub && ! this.sessionSub.closed ) this.sessionSub.unsubscribe();
 
+    for ( const sub of this.contactsChangesSub ) {
+
+      if ( ! sub.closed ) sub.unsubscribe();
+
+    }
+
   }
 
 }
