@@ -18,6 +18,7 @@ import { EastereggComponent } from './components/easteregg/easteregg.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoaderComponent } from './components/loader/loader.component';
 import { PersonComponent } from './components/person/person.component';
+import { DropzoneDirective } from './directives/dropzone.directive';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { PersonComponent } from './components/person/person.component';
     EastereggComponent,
     HomeComponent,
     LoaderComponent,
-    PersonComponent
+    PersonComponent,
+    DropzoneDirective
   ],
   imports: [
     BrowserModule,

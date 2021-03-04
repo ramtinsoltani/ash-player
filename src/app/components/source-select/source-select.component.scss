@@ -8,7 +8,7 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  padding: rem(20px);
+  padding: rem(10px);
 }
 
 .source-option {
@@ -16,12 +16,14 @@
   width: 100%;
   max-width: rem(500px);
   cursor: pointer;
+  border: rem(3px) dashed transparent;
+  border-radius: rem(3px);
   color: color('gray-light');
   fill: color('gray-light');
-  transition: fill .2s ease-in-out, color .2s ease-in-out;
-  padding: rem(10px);
+  transition: fill .2s ease-in-out, color .2s ease-in-out, border-color .2s ease-in-out;
+  padding: rem(20px);
   &:not(:first-child) {
-    margin-top: rem(30px);
+    margin-top: rem(20px);
   }
   &:hover {
     color: color('blue-light');
@@ -51,4 +53,10 @@
       font-size: rem(18px);
     }
   }
+}
+
+:host.dropzone-active .source-option[data-dropzone-reactive] {
+  border-color: color('blue-light');
+  color: color('blue-light');
+  fill: color('blue-light');
 }

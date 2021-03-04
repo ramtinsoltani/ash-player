@@ -26,18 +26,24 @@ export class BackendService {
 
   }
 
+  private isServerError(error: any): boolean {
+
+    return error.error === true && error.hasOwnProperty('message') && error.hasOwnProperty('code');
+
+  }
+
   private get errorHandler() {
 
     return catchError((error: HttpErrorResponse) => {
 
-      if ( error.error instanceof ErrorEvent ) {
+      if ( this.isServerError(error.error) ) {
 
-        return throwError(`Client Error: ${error.error.message}`);
+        return throwError({ status: error.status, message: error.error.message, code: error.error.code });
 
       }
       else {
 
-        return throwError({ status: error.status, message: error.error.message, code: error.error.code });
+        return throwError({ status: error.status, message: error.message });
 
       }
 

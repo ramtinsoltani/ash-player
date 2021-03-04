@@ -21,6 +21,9 @@ export class ControlsComponent implements OnInit, OnDestroy {
   @Input('show-logout')
   public showLogout: boolean;
 
+  @Input('status')
+  public status: SessionMemberStatus;
+
   @Output('onoptions')
   public onOptions = new EventEmitter<void>();
 
@@ -32,10 +35,8 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   public invitations: Invitation[] = [];
   public currentUser: User;
-  public status: SessionMemberStatus;
 
-  private sessionSub: Subscription;
-  private invitationsSub: Subscription;
+  private sub: Subscription;
 
   constructor(
     private app: AppService,
@@ -48,7 +49,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
     this.showOptions = this.showOptions !== undefined;
     this.showLogout = this.showLogout !== undefined;
 
-    this.invitationsSub = this.app.getInvitations(invitations => {
+    this.sub = this.app.getInvitations(invitations => {
 
       this.invitations = invitations;
 
@@ -56,22 +57,12 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
     this.currentUser = this.firebase.currentUser;
 
-    this.sessionSub = this.app.onSessionChanges(() => {
-
-      if ( this.app.isHost ) this.status = SessionMemberStatus.Ready;
-      else this.status = this.app.sessionMemberStatus;
-
-    });
-
   }
 
   ngOnDestroy(): void {
 
-    if ( this.invitationsSub && ! this.invitationsSub.closed )
-      this.invitationsSub.unsubscribe();
-
-    if ( this.sessionSub && ! this.sessionSub.closed )
-      this.sessionSub.unsubscribe();
+    if ( this.sub && ! this.sub.closed )
+      this.sub.unsubscribe();
 
   }
 

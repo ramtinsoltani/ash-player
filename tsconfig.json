@@ -23,7 +23,8 @@
       "@ash-player/config": ["src/app/app.config.json"],
       "@ash-player/service/*": ["src/app/services/*.service"],
       "@ash-player/model/*": ["src/app/models/*.model"],
-      "@ash-player/guard/*": ["src/app/guards/*.guard"]
+      "@ash-player/guard/*": ["src/app/guards/*.guard"],
+      "@ash-player/directive/*": ["src/app/directive/*.directive"]
     }
   },
   "angularCompilerOptions": {

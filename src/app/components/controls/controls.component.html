@@ -1,4 +1,10 @@
-<app-person current-user [force-status]="status" [invitations-count]="invitations.length" [user]="currentUser" (oninvitations)="onInvitations()"></app-person>
+<app-person
+  current-user
+  [force-status]="status"
+  [invitations-count]="! status ? invitations.length : 0"
+  [user]="currentUser"
+  (oninvitations)="onInvitations()">
+</app-person>
 <div *ngIf="showOptions" (click)="onOptions.emit()" class="control-button color-white">
   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="11.613" viewBox="0 0 40 11.613">
     <path d="M33.806,189.806A5.806,5.806,0,1,1,28,184,5.8,5.8,0,0,1,33.806,189.806ZM42.194,184A5.806,5.806,0,1,0,48,189.806,5.8,5.8,0,0,0,42.194,184Zm-28.387,0a5.806,5.806,0,1,0,5.806,5.806A5.8,5.8,0,0,0,13.806,184Z" transform="translate(-8 -184)"/>

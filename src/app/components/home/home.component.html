@@ -1,3 +1,7 @@
 <app-left-pane></app-left-pane>
-<app-source-select *ngIf="! source || (joined && memberStatus !== 'ready')" (onsource)="onSourceSelected($event)"></app-source-select>
+<app-source-select
+  *ngIf="! source || (joined && memberStatus !== 'ready')"
+  (onsource)="onSourceSelected($event)"
+  (dropzone)="onFileDrop($event)">
+</app-source-select>
 <app-video-player *ngIf="!! source && (host || (joined && memberStatus === 'ready'))" [source]="source"></app-video-player>

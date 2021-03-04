@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppService } from '@ash-player/service/app';
+import { SessionMemberStatus } from '@ash-player/model/database';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -10,6 +11,9 @@ import { Subscription } from 'rxjs';
 export class LeftPaneComponent implements OnInit, OnDestroy {
 
   public showLeave: boolean = false;
+  public showLogout: boolean = true;
+  public status: SessionMemberStatus;
+
   private sub: Subscription;
 
   constructor(
@@ -18,9 +22,13 @@ export class LeftPaneComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.sub = this.app.onSessionChanges(session => {
+    this.sub = this.app.onSessionChanges(() => {
 
-      this.showLeave = !! session;
+      if ( this.app.isHost ) this.status = SessionMemberStatus.Ready;
+      else this.status = this.app.sessionMemberStatus;
+
+      this.showLeave = !! this.status;
+      this.showLogout = ! this.status;
 
     });
 

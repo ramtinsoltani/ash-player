@@ -1,2 +1,8 @@
 <app-contacts></app-contacts>
-<app-controls [show-leave]="showLeave" (onleave)="onLeave()" show-logout (onlogout)="onLogout()"></app-controls>
+<app-controls
+  [status]="status"
+  [show-leave]="showLeave"
+  (onleave)="onLeave()"
+  [show-logout]="showLogout"
+  (onlogout)="onLogout()">
+</app-controls>

@@ -58,9 +58,9 @@ export class AppService {
 
         await this.router.navigate(['/home']);
 
-        await this.silent(this.backend.updateUserStatus(await this.firebase.getToken()));
+        await this.silent(this._notifyOnError(this.backend.updateUserStatus(await this.firebase.getToken())));
 
-        this._statusTimer = setInterval(async () => await this.silent(this.backend.updateUserStatus(await this.firebase.getToken())), 10000);
+        this._statusTimer = setInterval(async () => await this.silent(this._notifyOnError(this.backend.updateUserStatus(await this.firebase.getToken()))), 10000);
 
       }
 
@@ -68,6 +68,7 @@ export class AppService {
 
   }
 
+  /** Creates an error notification when the promise is rejected (promise will still reject). */
   private _notifyOnError<T>(promise: Promise<T>): Promise<T> {
 
     return new Promise<T>((resolve, reject) => {
@@ -85,10 +86,10 @@ export class AppService {
 
   }
 
-  private _getInvitations() {
+  /** Creates an error notification when the observable throws an error (rethrows the error). */
+  private _notifyOnObservableError<T>(observable: Observable<T>): Observable<T> {
 
-    return this.firebase.getInvitations()
-    .pipe(catchError(error => {
+    return observable.pipe(catchError(error => {
 
       this.notifications.error(error.message, error);
       return throwError(error);
@@ -97,6 +98,13 @@ export class AppService {
 
   }
 
+  private _getInvitations() {
+
+    return this._notifyOnObservableError(this.firebase.getInvitations());
+
+  }
+
+  /** Throws an error while creating an error notification. */
   private _throwError(error: Error) {
 
     this.notifications.error(error.message, error);
@@ -106,17 +114,8 @@ export class AppService {
 
   private async _subscribeToSession(id?: string) {
 
-    if ( ! this._firestoreSessionChanges$ ) {
-
-      this._firestoreSessionChanges$ = this.firebase.getSessionChanges(id)
-      .pipe(catchError(error => {
-
-        this.notifications.error(error.message, error);
-        return throwError(error);
-
-      }));
-
-    }
+    if ( ! this._firestoreSessionChanges$ )
+      this._firestoreSessionChanges$ = this._notifyOnObservableError(this.firebase.getSessionChanges(id));
 
     this._firestoreSessionChangesSub = this._firestoreSessionChanges$.subscribe(async session => {
 
@@ -220,25 +219,13 @@ export class AppService {
 
   public getContacts() {
 
-    return this.firebase.getContacts()
-    .pipe(catchError(error => {
-
-      this.notifications.error(error.message, error);
-      return throwError(error);
-
-    }));
+    return this._notifyOnObservableError(this.firebase.getContacts());
 
   }
 
   public getUserChanges(uid: string) {
 
-    return this.firebase.getUserChanges(uid)
-    .pipe(catchError(error => {
-
-      this.notifications.error(error.message, error);
-      return throwError(error);
-
-    }));
+    return this._notifyOnObservableError(this.firebase.getUserChanges(uid));
 
   }
 
